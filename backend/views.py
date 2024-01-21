@@ -123,3 +123,13 @@ def student_attendances(request, student_id):
                 attendance.save()
         return Response(status=status.HTTP_200_OK)
 
+
+@api_view(["PATCH"])
+def student_drop(request, student_id):
+    """
+    PATCH: Drop student from section
+    """
+    student = Student.objects.get(id=student_id)
+    student.active = False
+    student.save()
+    return Response(status=status.HTTP_200_OK)

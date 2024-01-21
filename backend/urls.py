@@ -34,6 +34,11 @@ urlpatterns = [
         "api/students/<int:student_id>/attendance/",
         views.student_attendances,
         name='student-attendances'
+    ),
+    path(
+        "api/students/<int:student_id>/drop/",
+        views.student_drop,
+        name='student-drop'
     )
 ]
 
