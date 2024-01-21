@@ -31,6 +31,9 @@ export const Student = ({}: StudentProps) => {
             Mentor: {student.section.mentor.user.first_name}{" "}
             {student.section.mentor.user.last_name}
           </p>
+          <p>
+            Attendances: 
+          </p>
         </div>
       )}
     </div>

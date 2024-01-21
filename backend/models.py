@@ -29,3 +29,15 @@ class Section(models.Model):
 
 class Course(models.Model):
     name = models.CharField(max_length=20)
+
+
+# Create an Attendance model, which stores the attendance of a student on a given date.
+class Attendance(models.Model):
+    class Presence(models.TextChoices):
+        PRESENT = "PR", "Present"
+        UNEXCUSED_ABSENCE = "UN", "Unexcused absence"
+        EXCUSED_ABSENCE = "EX", "Excused absence"
+
+    student = models.ForeignKey("Student", on_delete=models.CASCADE)
+    date = models.DateField()
+    presence = models.CharField(max_length=2, choices=Presence.choices, blank=True)

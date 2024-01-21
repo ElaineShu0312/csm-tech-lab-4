@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Section as SectionType, Student } from "../utils/types";
 import { Link, useParams } from "react-router-dom";
+import Cookies from "js-cookie";
+
+const token = Cookies.get("csrftoken")
 
 export const Section = () => {
   const [section, setSection] = useState<SectionType>(undefined as never);
@@ -20,6 +23,18 @@ export const Section = () => {
       });
   }, []);
 
+  const DropHandler = (StudentId: number) => {
+    const newStudents = students.filter((student) => student.id !== StudentId);
+    setStudents(newStudents)
+
+    fetch(`/api/students/${StudentId}/drop/`,{
+      method: "PATCH",
+      headers: {
+         "X-CSRFToken": token ?? "",
+      }
+    });
+  }
+
   return (
     <div>
       <h1>Section</h1>
@@ -38,6 +53,7 @@ export const Section = () => {
       <ul>
         {students.map((student) => (
           <li key={student.id}>
+            <button onClick = {() => DropHandler(student.id)}>Drop</button>
             <Link to={`/students/${student.id}`}>
               {student.user.first_name} {student.user.last_name} (id:{" "}
               {student.id})

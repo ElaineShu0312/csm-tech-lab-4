@@ -20,4 +20,15 @@ urlpatterns = [
         views.student_details,
         name="student-details",
     ),
+    path(
+        "api/students/<int:student_id>/mentor/", 
+        views.student_mentor, 
+        name='student-mentor'
+    ),
+    path(
+        "api/students/<int:student_id>/course/",
+        views.student_course,
+        name='student-course'
+    )
 ]
+
