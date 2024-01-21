@@ -20,7 +20,7 @@ export const Student = ({}: StudentProps) => {
 
 
     // I just wrote this part, I'm not sure if it works (Elaine Shu)
-    fetch(`/api/students/${id}/attendance/`) //ISSUE W/ this line
+    fetch(`/api/students/${id}/attendances/`) //ISSUE W/ this line
       .then((res) => res.json())
       .then((data) => {
       // TODO: sort data from least to most recent
