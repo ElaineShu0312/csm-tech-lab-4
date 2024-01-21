@@ -2,7 +2,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 
-from backend.models import User, Section, Student, Mentor
+from backend.models import User, Section, Student, Mentor, Attendance
 from backend.serializers import (
     UserSerializer,
     StudentSerializer,
@@ -72,56 +72,79 @@ def student_details(request, student_id):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-# Theoretically gets the Course for a student's section, given student ID
-@api_view(["GET"])
-def student_course(request, student_id):
-    try:
-        student = Student.objects.get(id=student_id)
-        course_id = student.section.course
-        return Response({"course_id": course_id}, status=status.HTTP_200_OK)
-    except Student.DoesNotExist:
-        return Response({"error": "Student not found"},status=status.HTTP_404_NOT_FOUND)
+# # Theoretically gets the Course for a student's section, given student ID
+# @api_view(["GET"])
+# def student_course(request, student_id):
+#     try:
+#         student = Student.objects.get(id=student_id)
+#         section = student.section
+#         course_serializer = CourseSerializer(section.course)
+#         return Response(course_serializer.data, status=status.HTTP_200_OK)
+#     except Student.DoesNotExist:
+#         return Response({"error": "Student not found"},status=status.HTTP_404_NOT_FOUND)
 
 
-# Theoretically gets the mentor of a student's section, given student ID
-@api_view(["GET"])
-def student_mentor(request, student_id):
-    """
-    GET: Return student's mentor
-    """
-    try:
-        student = Student.objects.get(id=student_id)
-        mentor = student.section.mentor
-        serializer = MentorSerializer(mentor)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    except Student.DoesNotExist:
-        return Response({"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
-    except Mentor.DoesNotExist:
-        return Response({"error": "Mentor not found for the student's section"}, status=status.HTTP_404_NOT_FOUND)
+# # Theoretically gets the mentor of a student's section, given student ID
+# @api_view(["GET"])
+# def student_mentor(request, student_id):
+#     """
+#     GET: Return student's mentor
+#     """
+#     try:
+#         student = Student.objects.get(id=student_id)
+#         mentor = student.section.mentor
+#         serializer = MentorSerializer(mentor)
+#         return Response(serializer.data, status=status.HTTP_200_OK)
+#     except Student.DoesNotExist:
+#         return Response({"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
+#     except Mentor.DoesNotExist:
+#         return Response({"error": "Mentor not found for the student's section"}, status=status.HTTP_404_NOT_FOUND)
     
 
 # Theoretically gets all of a student's attendances, given student ID
 @api_view(["GET", "PUT"])
 def student_attendances(request, student_id):
+    print(f"Debug: Entering student_attendances view for student_id={student_id}")
     """
     GET: Return all attendance objects associated with a student
     PUT: Update student attendance (PR - present, UN - unexcused absence, EX - excused absence)
     """
     if request.method == "GET":
-        student = Student.objects.get(id=student_id)
-        attendances = student.attendance_set.all()
-        serializer = AttendanceSerializer(attendances, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        try:
+            student = Student.objects.get(id=student_id)
+            attendances = student.attendance_set.all()
+            serializer = AttendanceSerializer(attendances, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Student.DoesNotExist:
+            return Response({"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
     elif request.method == "PUT":
-        student = Student.objects.get(id=student_id)
-        attendances = student.attendance_set.all()
-        for attendance in attendances:
-            date = attendance.date
-            presence = request.data.get(str(date))
-            if presence is not None:
+        try: 
+            student = Student.objects.get(id=student_id)
+            attendances = student.attendance_set.all()
+            for attendance in attendances:
+                date_str = str(attendance.date)
+            presence = request.data.get(date_str)
+
+            if presence in ['PR', 'UN', 'EX']:
                 attendance.presence = presence
                 attendance.save()
-        return Response(status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_200_OK)
+    
+        except Student.DoesNotExist:
+            return Response({"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+            
+        # attendance_id = request.data.get("id")
+        # presence = request.data.get("presence")
+        # if attendance_id is None or presence is None:
+        #     return Response(status=status.HTTP_400_BAD_REQUEST)
+        # attendance = Attendance.objects.get(id=attendance_id)
+        # attendance.presence = presence
+        # attendance.save()
+        # return Response(status=status.HTTP_200_OK)
+
+
 
 
 @api_view(["PATCH"])

@@ -20,21 +20,21 @@ urlpatterns = [
         views.student_details,
         name="student-details",
     ),
-    path(
-        "api/students/<int:student_id>/mentor/", 
-        views.student_mentor, 
-        name='student-mentor'
-    ),
-    path(
-        "api/students/<int:student_id>/course/",
-        views.student_course,
-        name='student-course'
-    ),
-    path(
-        "api/students/<int:student_id>/attendance/",
+    # path(
+    #     "api/students/<int:student_id>/mentor/", 
+    #     views.student_mentor, 
+    #     name='student-mentor'
+    # ),
+    # path(
+    #     "api/students/<int:student_id>/course/",
+    #     views.student_course,
+    #     name='student-course'
+    # ),
+    path('api/students/<int:student_id>/attendances/', 
         views.student_attendances,
         name='student-attendances'
     ),
+
     path(
         "api/students/<int:student_id>/drop/",
         views.student_drop,

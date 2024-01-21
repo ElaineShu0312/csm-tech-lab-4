@@ -32,3 +32,10 @@ export interface Student {
   active: boolean;
   banned: boolean;
 }
+
+export interface Attendance {
+  id: number;
+  student: Student;
+  date: string;
+  presence: string;
+}
