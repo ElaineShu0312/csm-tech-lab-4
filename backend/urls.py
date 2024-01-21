@@ -29,6 +29,11 @@ urlpatterns = [
         "api/students/<int:student_id>/course/",
         views.student_course,
         name='student-course'
+    ),
+    path(
+        "api/students/<int:student_id>/attendance/",
+        views.student_attendances,
+        name='student-attendances'
     )
 ]
 

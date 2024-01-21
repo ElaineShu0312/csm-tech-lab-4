@@ -8,6 +8,7 @@ from backend.serializers import (
     StudentSerializer,
     MentorSerializer,
     SectionSerializer,
+    AttendanceSerializer,
     CourseSerializer,
 )
 
@@ -71,7 +72,7 @@ def student_details(request, student_id):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-# This theoretically gets the Course for a student's section, given student ID
+# Theoretically gets the Course for a student's section, given student ID
 @api_view(["GET"])
 def student_course(request, student_id):
     try:
@@ -82,7 +83,7 @@ def student_course(request, student_id):
         return Response({"error": "Student not found"},status=status.HTTP_404_NOT_FOUND)
 
 
-# This theoretically gets the mentor of a student's section, given student ID
+# Theoretically gets the mentor of a student's section, given student ID
 @api_view(["GET"])
 def student_mentor(request, student_id):
     """
@@ -97,3 +98,28 @@ def student_mentor(request, student_id):
         return Response({"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
     except Mentor.DoesNotExist:
         return Response({"error": "Mentor not found for the student's section"}, status=status.HTTP_404_NOT_FOUND)
+    
+
+# Theoretically gets all of a student's attendances, given student ID
+@api_view(["GET", "PUT"])
+def student_attendances(request, student_id):
+    """
+    GET: Return all attendance objects associated with a student
+    PUT: Update student attendance (PR - present, UN - unexcused absence, EX - excused absence)
+    """
+    if request.method == "GET":
+        student = Student.objects.get(id=student_id)
+        attendances = student.attendance_set.all()
+        serializer = AttendanceSerializer(attendances, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    elif request.method == "PUT":
+        student = Student.objects.get(id=student_id)
+        attendances = student.attendance_set.all()
+        for attendance in attendances:
+            date = attendance.date
+            presence = request.data.get(str(date))
+            if presence is not None:
+                attendance.presence = presence
+                attendance.save()
+        return Response(status=status.HTTP_200_OK)
+
