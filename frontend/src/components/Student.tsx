@@ -6,6 +6,7 @@ interface StudentProps {}
 
 export const Student = ({}: StudentProps) => {
   const [student, setStudent] = useState<StudentType>(undefined as never);
+  const [attendances, setAttendances] = useState<StudentType>(undefined as never);
   const { id } = useParams<string>();
 
   useEffect(() => {
@@ -14,7 +15,16 @@ export const Student = ({}: StudentProps) => {
       .then((data) => {
         setStudent(data);
       });
-  }, []);
+
+
+      // I just wrote this part, I'm not sure if it works (Elaine Shu)
+      fetch(`/api/students/${id}/attendances`)
+      .then((res) => res.json())
+      .then((data) => {
+        // TODO: we need to sort the attendances by date
+        setAttendances(data);
+      });
+    }, []);
 
   return (
     <div>
